@@ -14,6 +14,58 @@ This project contains a Bash script that extracts daily logs from a specified sy
 
 ---
 
+## 📜 Script: `save_logs.sh`
+
+Copy and paste this into a file using `nano save_logs.sh`:
+
+```bash
+#!/bin/bash
+
+# === Configuration ===
+UNIT_NAME="your_service_name"             # ← Replace with your systemd service name
+REPO_DIR="$HOME/github-log-backups"      # ← Local path to your cloned GitHub repo
+LOG_DIR="$REPO_DIR/logs"
+
+# Ensure the log directory exists
+mkdir -p "$LOG_DIR"
+cd "$REPO_DIR" || exit 1
+
+# === Timestamps ===
+NOW_HUMAN=$(date "+%Y-%m-%d 00:00:00")
+YESTERDAY_HUMAN=$(date -d "1 day ago" "+%Y-%m-%d 00:00:00")
+NOW_FILENAME=$(date "+%Y-%m-%d")
+YESTERDAY_FILENAME=$(date -d "1 day ago" "+%Y-%m-%d")
+
+# === Log file path ===
+LOG_FILE="$LOG_DIR/${UNIT_NAME}_logs_${YESTERDAY_FILENAME}_to_${NOW_FILENAME}.log"
+echo "📄 Saving logs from $YESTERDAY_HUMAN to $NOW_HUMAN into $LOG_FILE"
+
+# === Collect logs ===
+sudo journalctl -u "$UNIT_NAME" --since "$YESTERDAY_HUMAN" --until "$NOW_HUMAN" --no-pager -o short-iso > "$LOG_FILE"
+
+# === Skip if log file is empty ===
+if [ ! -s "$LOG_FILE" ]; then
+  echo "⚠️ Log file is empty. Removing it."
+  rm -f "$LOG_FILE"
+  exit 0
+fi
+
+# === Git: Commit and Push ===
+echo "✅ Logs saved. Committing to GitHub."
+
+# Set Git identity if needed (optional for automation)
+git config pull.rebase true
+git config user.name "log-bot"
+git config user.email "log-bot@example.com"
+
+git add "$LOG_FILE"
+git commit -m "Add ${UNIT_NAME} logs: ${YESTERDAY_FILENAME} to ${NOW_FILENAME}"
+git pull --rebase origin main
+git push origin main
+```
+
+---
+
 ## 📦 Installation & Setup
 
 ### 1. Clone the repository
