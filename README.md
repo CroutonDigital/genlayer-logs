@@ -68,20 +68,32 @@ git push origin main
 
 ## 📦 Installation & Setup
 
-### 1. Clone the repository
+### 1. Create a GitHub repository
+
+Create a **private GitHub repository** named for example: `log-backups`. Do **not** initialize it with a README.
+
+---
+
+### 2. Clone the repository using SSH
+
+> ⚠️ Make sure your GitHub account has an SSH key added, and you're using the `git@github.com:...` SSH format.
 
 ```bash
-git clone git@github.com:yourusername/your-log-repo.git ~/github-log-backups
+git clone git@github.com:yourusername/log-backups.git ~/github-log-backups
 cd ~/github-log-backups
 ```
 
-### 2. Make the script executable
+---
+
+### 3. Make the script executable
 
 ```bash
 chmod +x save_logs.sh
 ```
 
-### 3. Edit the configuration in `save_logs.sh`
+---
+
+### 4. Edit the configuration in `save_logs.sh`
 
 Update these variables at the top of the script:
 
@@ -90,7 +102,9 @@ UNIT_NAME="your_service_name"         # e.g. nginx, docker, your-custom-service
 REPO_DIR="$HOME/github-log-backups"  # path to this repo
 ```
 
-### 4. Add your SSH key to GitHub (if not already)
+---
+
+### 5. Add your SSH key to GitHub (if not already)
 
 ```bash
 eval "$(ssh-agent -s)"
